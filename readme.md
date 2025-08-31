@@ -38,6 +38,50 @@ This command will:
 - Inject a secure, random `SECRET_KEY`.
 - Optionally set `DATABASE_URL`.
 
+## Run with Docker Compose (GHCR image)
+
+This project ships a `docker-compose.yml` that pulls the published container image from GitHub Container Registry (GHCR).
+
+Prerequisites:
+- Ensure the image is public at `ghcr.io/techmc-studios/web-verify` or login to GHCR if private.
+  ```bash
+  echo $GITHUB_TOKEN | docker login ghcr.io -u YOUR_GITHUB_USERNAME --password-stdin
+  ```
+
+Start services:
+```bash
+# From web/
+docker compose up -d
+```
+
+Check health:
+```bash
+curl http://localhost:8000/health
+# {"status":"ok"}
+```
+
+Initialize the first API key (only once):
+```bash
+docker compose exec web python manage.py init-key
+# It will print:
+# Initial API key created
+# id: <uuid>
+# key: <plaintext>
+```
+
+List keys later:
+```bash
+docker compose exec web python manage.py list
+```
+
+Use a specific image tag:
+```yaml
+# docker-compose.yml (web service)
+image: ghcr.io/techmc-studios/web-verify:latest
+# or a commit tag
+# image: ghcr.io/techmc-studios/web-verify:sha-3922704
+```
+
 ## API Key Management (manage.py)
 
 This project includes a small CLI to manage API keys. Run commands from the `web/` directory:
@@ -60,7 +104,7 @@ python manage.py delete <id>
 
 Notes:
 - The CLI loads environment variables from `.env` if present (e.g., `DATABASE_URL`).
-- The API server creates the first API key automatically on first boot if none exist and prints it to the console.
+- The API server no longer creates an API key automatically. Use `python manage.py init-key` (or `docker compose exec web python manage.py init-key`) to create the first key on demand.
 
 ## Database Management (manage.py)
 

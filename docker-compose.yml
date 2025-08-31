@@ -14,7 +14,7 @@ services:
       retries: 10
 
   web:
-    build: .
+    image: ghcr.io/techmc-studios/web-verify:latest
     # Uses Dockerfile default CMD: gunicorn -w 3 -b 0.0.0.0:8000 run:app
     environment:
       # SECRET_KEY is optional; if unset, the app generates a secure one at runtime
