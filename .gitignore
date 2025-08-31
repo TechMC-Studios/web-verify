@@ -1,0 +1,73 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+.envrc
+.python-version
+
+# Environment and secrets
+.env
+.env.*
+*.secret
+*.key
+
+# Test and coverage
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Type checkers and linters
+.mypy_cache/
+.pytype/
+.pyre/
+ruff_cache/
+
+# Editors/IDEs
+.vscode/
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# SQLite/Local DBs
+*.db
+*.sqlite
+*.sqlite3
+instance/
+
+# Docker
+*.pid
+*.tar
+
+# Node (if present)
+node_modules/
+
+# Flask specific
+# (keep tests/tests.http tracked; do not ignore it)
+# Ignore runtime files if generated
+*.pid
+
+# Misc
+model.txt
+docker-compose-dev.yml

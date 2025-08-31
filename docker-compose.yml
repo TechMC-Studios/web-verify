@@ -1,0 +1,41 @@
+services:
+  postgres:
+    image: postgres:12
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: mypass
+      POSTGRES_DB: web
+    volumes:
+      - pgdata:/var/lib/postgresql/data 
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build: .
+    # Uses Dockerfile default CMD: gunicorn -w 3 -b 0.0.0.0:8000 run:app
+    environment:
+      # SECRET_KEY is optional; if unset, the app generates a secure one at runtime
+      # SECRET_KEY: "please-set-in-prod"
+      FLASK_APP: "run:app"
+      # SQLAlchemy async URL (adjust user/password/host for your environment)
+      DATABASE_URL: "postgresql+asyncpg://user:mypass@postgres:5432/web"
+      # Production mode (no debug)
+      FLASK_DEBUG: "false"
+      FLASK_ENV: "production"
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "python -c 'import urllib.request,sys; sys.exit(0 if urllib.request.urlopen(\"http://localhost:8000/health\").status==200 else 1)' "]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  pgdata:

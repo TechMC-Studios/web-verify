@@ -1,0 +1,88 @@
+### Health check (no auth required)
+GET http://localhost:5000/health
+
+### List resources
+GET http://localhost:5000/resources/
+X-API-Key: {{API_KEY}}
+X-API-Key-Id: {{API_KEY_ID}}
+
+### Get resource by slug
+GET http://localhost:5000/resources/storagemechanic
+X-API-Key: {{API_KEY}}
+X-API-Key-Id: {{API_KEY_ID}}
+
+### Verify purchase (Spigot)
+POST http://localhost:5000/verify/spigot
+Content-Type: application/json
+X-API-Key: {{API_KEY}}
+X-API-Key-Id: {{API_KEY_ID}}
+
+{
+  "spigotUserId": "123456",
+  "spigotUsername": "SomeUser",
+  "resourceSlug": "storagemechanic"
+}
+
+### Verify purchase (Polymart)
+POST http://localhost:5000/verify/polymart
+Content-Type: application/json
+X-API-Key: {{API_KEY}}
+X-API-Key-Id: {{API_KEY_ID}}
+
+{
+  "polymartUserId": "78910",
+  "polymartUsername": "AnotherUser",
+  "resourceSlug": "storagemechanic"
+}
+
+### Get user data and purchases (Spigot user example)
+GET http://localhost:5000/users/spigot/123456
+X-API-Key: {{API_KEY}}
+X-API-Key-Id: {{API_KEY_ID}}
+
+### Set Discord ID for user (Spigot)
+POST http://localhost:5000/users/spigot/123456/discord
+Content-Type: application/json
+X-API-Key: {{API_KEY}}
+X-API-Key-Id: {{API_KEY_ID}}
+
+{
+  "discordId": "999999999999999999"
+}
+
+### Get user by Discord ID (Spigot)
+GET http://localhost:5000/users/spigot/discord/999999999999999999
+X-API-Key: {{API_KEY}}
+X-API-Key-Id: {{API_KEY_ID}}
+
+### Create a second Spigot user via verification (so user exists)
+POST http://localhost:5000/verify/spigot
+Content-Type: application/json
+X-API-Key: {{API_KEY}}
+X-API-Key-Id: {{API_KEY_ID}}
+
+{
+  "spigotUserId": "222222",
+  "spigotUsername": "OtherUser",
+  "resourceSlug": "storagemechanic"
+}
+
+### Try to assign same discord to the second user (expect 409)
+POST http://localhost:5000/users/spigot/222222/discord
+Content-Type: application/json
+X-API-Key: {{API_KEY}}
+X-API-Key-Id: {{API_KEY_ID}}
+
+{
+  "discordId": "999999999999999999"
+}
+
+### Unset Discord ID for first user
+DELETE http://localhost:5000/users/spigot/123456/discord
+X-API-Key: {{API_KEY}}
+X-API-Key-Id: {{API_KEY_ID}}
+
+### Delete first user (Spigot)
+DELETE http://localhost:5000/users/spigot/123456
+X-API-Key: {{API_KEY}}
+X-API-Key-Id: {{API_KEY_ID}}

@@ -1,0 +1,44 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.dist-info/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Env files / secrets
+.env
+.env.*
+
+# VCS
+.git/
+.gitignore
+
+# IDE / tooling
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Caches
+.pytest_cache/
+.mypy_cache/
+.cache/
+
+# Local data and temp (mounted at runtime via volumes)
+backups/
+tmp/
+logs/
+
+# Tests (not needed in runtime image)
+tests/
+
+# Docker / Compose files (not needed in image context)
+docker-compose*.yml
+Dockerfile*

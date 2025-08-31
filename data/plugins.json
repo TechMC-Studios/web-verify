@@ -1,0 +1,17 @@
+[
+    {
+        "name": "Storage Mechanic",
+        "id": "storagemechanic",
+        "shops": {
+            "spigotmc": {
+                "resource_id": 90379
+            },
+            "polymart": {
+                "resource_id": 2978
+            },
+            "builtbybit": {
+                "resource_id": 25726
+            }
+        }
+    }
+]
