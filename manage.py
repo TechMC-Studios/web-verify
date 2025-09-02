@@ -27,7 +27,7 @@ def maybe_load_dotenv():
         load_dotenv(env_path)
 
 
-async def cmd_create(name: str | None, scopes: list[str] | None, length: int) -> None:
+async def cmd_create(name: str | None, length: int) -> None:
     async with get_session() as session:
         kid, plain, stored = new_api_key_record(length=length)
         row = APIKey(
@@ -36,15 +36,12 @@ async def cmd_create(name: str | None, scopes: list[str] | None, length: int) ->
             hash=stored,
             method="pbkdf2_sha256",
             active=True,
-            scopes=scopes or None,
         )
         session.add(row)
         await session.commit()
         print("Created API key")
         print(f"id: {kid}")
         print(f"key: {plain}")
-        if scopes:
-            print(f"scopes: {scopes}")
 
 
 async def cmd_list(json_out: bool) -> None:
@@ -59,7 +56,6 @@ async def cmd_list(json_out: bool) -> None:
                     "active": r.active,
                     "created_at": (r.created_at.isoformat() if r.created_at else None),
                     "last_used_at": (r.last_used_at.isoformat() if r.last_used_at else None),
-                    "scopes": r.scopes,
                 }
                 for r in rows
             ]
@@ -68,7 +64,7 @@ async def cmd_list(json_out: bool) -> None:
         for r in rows:
             created = r.created_at.isoformat() if r.created_at else ""
             last = r.last_used_at.isoformat() if r.last_used_at else ""
-            print(f"- id={r.id} name={r.name} active={r.active} created_at={created} last_used_at={last} scopes={r.scopes}")
+            print(f"- id={r.id} name={r.name} active={r.active} created_at={created} last_used_at={last}")
 
 
 async def _set_active(kid: str, active: bool) -> int:
@@ -121,7 +117,6 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_create = sub.add_parser("create", help="Create a new API key")
     p_create.add_argument("--name", help="Optional name")
-    p_create.add_argument("--scopes", nargs="*", help="Optional scopes", default=None)
     p_create.add_argument("--length", type=int, default=48, help="API key length (default: 48)")
 
     p_list = sub.add_parser("list", help="List API keys")
@@ -185,7 +180,7 @@ async def main_async(args) -> None:
         return
     if args.cmd == "create":
         await ensure_db_ready()
-        await cmd_create(args.name, args.scopes, args.length)
+        await cmd_create(args.name, args.length)
     elif args.cmd == "list":
         await ensure_db_ready()
         await cmd_list(args.json)
@@ -344,6 +339,9 @@ async def cmd_db_import(*, input_path: str, wipe: bool) -> None:
         await session.flush()
 
         for rec in payload.get("api_keys", []):
+            # Backward compatibility: ignore legacy 'scopes' field if present
+            rec = dict(rec)
+            rec.pop("scopes", None)
             session.merge(APIKey(**rec))
         await session.commit()
 

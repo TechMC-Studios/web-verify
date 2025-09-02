@@ -19,7 +19,6 @@ services:
     environment:
       # SECRET_KEY is optional; if unset, the app generates a secure one at runtime
       # SECRET_KEY: "please-set-in-prod"
-      FLASK_APP: "run:app"
       # SQLAlchemy async URL (adjust user/password/host for your environment)
       DATABASE_URL: "postgresql+asyncpg://user:mypass@postgres:5432/web"
       # Production mode (no debug)

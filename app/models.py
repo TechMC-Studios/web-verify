@@ -11,7 +11,6 @@ from sqlalchemy import (
     ForeignKey,
     UniqueConstraint,
 )
-from sqlalchemy import JSON
 from .db import Base
 
 class Platform(Base):
@@ -69,4 +68,3 @@ class APIKey(Base):
     active = Column(Boolean, nullable=False, default=True)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     last_used_at = Column(DateTime(timezone=True))
-    scopes = Column(JSON)

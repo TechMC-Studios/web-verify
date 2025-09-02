@@ -10,7 +10,6 @@ from web.utils import api_key
 def test_generate_length_and_prefix():
     key = api_key.generate_api_key(length=32)
     assert key.startswith('sk_')
-    # token length should be >= requested (prefix excluded)
     token = key[len('sk_'):]
     assert len(token) >= 32
 
@@ -20,7 +19,6 @@ def test_hash_and_verify():
     stored = api_key.hash_api_key(key)
     assert stored.startswith('pbkdf2_sha256$')
     assert api_key.verify_api_key(key, stored)
-    # wrong key fails
     assert not api_key.verify_api_key(key + 'x', stored)
 
 
@@ -30,13 +28,11 @@ def test_new_api_key_record_and_pair():
     assert isinstance(plain, str)
     assert api_key.verify_api_key(plain, stored)
 
-    # deprecated pair
     p, s = api_key.new_api_key_pair(length=24)
     assert api_key.verify_api_key(p, s)
 
 
 def test_iter_edge_cases():
-    # iterations must be respected - produce different stored for different iteration counts
     key = api_key.generate_api_key(length=30)
     s1 = api_key.hash_api_key(key, iterations=100_000)
     s2 = api_key.hash_api_key(key, iterations=200_000)

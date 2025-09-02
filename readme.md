@@ -1,3 +1,12 @@
+# TechMC Web Verify
+
+This repository contains a lightweight Flask-based verification API for TechMC Studios. It provides endpoints to:
+- Verify purchases/ownership of resources (e.g., SpigotMC, Polymart) under `'/verify'`
+- Browse resources and users under `'/resources'` and `'/users'`
+- Check service health at `'/health'`
+
+Access is protected via API keys stored in the database. The service uses async SQLAlchemy with PostgreSQL, includes Docker Compose for easy deployment (images published to GHCR), and ships a `manage.py` CLI to manage API keys and database tasks.
+
 ## Install dependencies
 
 ```bash
@@ -42,12 +51,6 @@ This command will:
 
 This project ships a `docker-compose.yml` that pulls the published container image from GitHub Container Registry (GHCR).
 
-Prerequisites:
-- Ensure the image is public at `ghcr.io/techmc-studios/web-verify` or login to GHCR if private.
-  ```bash
-  echo $GITHUB_TOKEN | docker login ghcr.io -u YOUR_GITHUB_USERNAME --password-stdin
-  ```
-
 Start services:
 ```bash
 # From web/
@@ -88,7 +91,7 @@ This project includes a small CLI to manage API keys. Run commands from the `web
 
 ```bash
 # Create a new API key (prints id and the plaintext key once)
-python manage.py create --name "ops" --scopes read write --length 48
+python manage.py create --name "ops" --length 48
 
 # List existing API keys
 python manage.py list
