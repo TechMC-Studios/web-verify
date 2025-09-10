@@ -13,10 +13,25 @@ Access is protected via API keys stored in the database. The service uses async 
 pip install -r requirements.txt
 ```
 
-## Run bot
+## Run locally (development)
+
+You can start a local development server using the built-in CLI. From the `web/` directory:
 
 ```bash
-python main.py
+python manage.py start --host 127.0.0.1 --port 5000 --debug
+```
+
+Alternatively, with Flask:
+
+```bash
+export FLASK_APP=run.py
+flask run --host 127.0.0.1 --port 5000 --debug
+```
+
+To run with Gunicorn (production-like):
+
+```bash
+gunicorn -w 1 -b 0.0.0.0:8000 run:app
 ```
 
 ## Environment variables
@@ -109,6 +124,19 @@ Notes:
 - The CLI loads environment variables from `.env` if present (e.g., `DATABASE_URL`).
 - The API server no longer creates an API key automatically. Use `python manage.py init-key` (or `docker compose exec web python manage.py init-key`) to create the first key on demand.
 
+### Quick usage example
+
+Most endpoints require an API key provided via headers. Replace `<ID>` and `<KEY>` with your values:
+
+```bash
+# Health is public (no API key required)
+curl http://127.0.0.1:5000/health
+
+# Example protected call (adjust URL and method as needed)
+curl -H "X-API-Key-Id: <ID>" -H "X-API-Key: <KEY>" \
+  http://127.0.0.1:5000/resources
+```
+
 ## Database Management (manage.py)
 
 Use the CLI to manage the database:
@@ -132,3 +160,11 @@ Notes:
 - `db-reset` is destructive; it drops all tables and recreates them.
 - `db-export` includes all tables (platforms, resources, links, users, purchases, api_keys). API keys are exported without plaintext.
 - `db-import` upserts by primary key. Use `--wipe` to start from a clean database.
+
+## Refresh resources from data/plugins.json
+
+Safely upsert Platforms, Resources and ResourceShopID links based on `data/plugins.json` without deleting existing data:
+
+```bash
+python manage.py resources-refresh --file data/plugins.json
+```

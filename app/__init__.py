@@ -1,11 +1,9 @@
-import os
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify
 
 from .config import configure_app
 from .db import init_db, create_all, get_session, get_engine
 from sqlalchemy import select
 from .models import APIKey, Platform, Resource, ResourceShopID
-from utils.api_key import new_api_key_record
 import asyncio
 #from .seed import run_seed_and_bootstrap
 
@@ -17,9 +15,6 @@ def create_app() -> Flask:
     # Initialize database bindings
     init_db(app)
 
-    # Track DB availability
-    app.config.setdefault("DB_AVAILABLE", True)
-    app.config.setdefault("_DB_LAST_CHECK_TS", 0.0)
 
     # Organized bootstrap: create tables, seed base data, ensure API key
     async def _bootstrap():
@@ -133,38 +128,7 @@ def create_app() -> Flask:
     #with app.app_context():
     #    run_seed_and_bootstrap(app)
 
-    # Periodic DB health check and guard: return 503 when DB is down (except health endpoint)
-    from sqlalchemy import text
-
-    @app.before_request  # type: ignore[misc]
-    async def _db_guard():
-        # allow health endpoint always
-        if request.endpoint in {"health"}:
-            return None
-
-        import time
-        now = time.time()
-        # refresh status every 5 seconds
-        if (now - float(app.config.get("_DB_LAST_CHECK_TS", 0))) > 5.0:
-            try:
-                async with get_session() as session:
-                    await session.execute(text("SELECT 1"))
-                app.config["DB_AVAILABLE"] = True
-            except Exception:
-                app.config["DB_AVAILABLE"] = False
-            finally:
-                app.config["_DB_LAST_CHECK_TS"] = now
-
-        if not app.config.get("DB_AVAILABLE", True):
-            return (
-                jsonify({
-                    "error": "service_unavailable",
-                    "message": "Database is unavailable. Please try again later.",
-                }),
-                503,
-            )
-
-    # Register API key middleware AFTER the DB guard to avoid touching DB when it's down
+    # Register API key middleware
     from .auth import require_api_key
     app.before_request(require_api_key)
 
